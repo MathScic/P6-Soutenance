@@ -1,4 +1,3 @@
-//Modal
 import { travaux, displayTravaux } from "./script.js";
 let modal = document.querySelector(".modal");
 const modalImg = modal.querySelector(".modal-img");
@@ -42,7 +41,7 @@ const openModal = async (e) => {
         );
 
         //
-        //window.location.reload();
+        // window.location.reload();
         const allWorksWithoutTheDeletedOne = travaux.filter(
           (work) => work.id !== image.id
         );
@@ -130,8 +129,12 @@ function getImgData() {
       imgPreview.innerHTML = '<img src="' + this.result + '" />';
     });
     document.querySelector("label").style.display = "none";
-    document.querySelector(".fa-regular").style.display = "none";
-    document.querySelector(".size_max").style.display = "none";
+    if (document.querySelector(".fa-regular")) {
+      document.querySelector(".fa-regular").style.display = "none";
+    }
+    if (document.querySelector(".size_max")) {
+      document.querySelector(".size_max").style.display = "none";
+    }
   }
 }
 
@@ -157,15 +160,35 @@ formAddPicture.addEventListener("submit", (event) => {
     headers: {
       Authorization: `Bearer ${localStorage.getItem("token")}`,
     },
-  }).then(() => {
-    /**try {
-      const response = await fetch("http://localhost:5678/api/works");
-      travaux = await response.json();
+  }).then((res) => {
+    // window.location.reload(); //Permet de raffraichir en ajoutant des photos
+    //const response = res.json();
+    console.log(res);
+    if (res.ok) {
+      const modaleGallery = document.querySelector(".modal");
+      modaleGallery.innerHTML = "";
+      getImgData();
+      refreshData();
+
+      //displayTravaux(travaux)
+    } else {
+      alert("erreur DL new ressources");
+    }
+  });
+
+  async function fetchData() {
+    try {
+      let response = await fetch("http://localhost:5678/api/works");
+      return await response.json();
     } catch (error) {
       console.log(error);
-    }**/
-    //window.location.reload(); //Permet de raffraichir en ajoutant des photos
-  });
+    }
+  }
+
+  async function refreshData() {
+    const newTravaux = await fetchData();
+    displayTravaux(newTravaux);
+  }
   /**try {
     const response = response.json();
 
