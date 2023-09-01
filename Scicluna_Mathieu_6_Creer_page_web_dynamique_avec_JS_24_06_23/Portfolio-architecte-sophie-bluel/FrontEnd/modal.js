@@ -1,3 +1,4 @@
+//Modal
 import { travaux, displayTravaux } from "./script.js";
 let modal = document.querySelector(".modal");
 const modalImg = modal.querySelector(".modal-img");
@@ -8,6 +9,15 @@ const openModal = async (e) => {
   const maxImg = 11;
   let counterImg = 0;
 
+  refreshMiniature(travaux);
+
+  modal.style.display = "flex"; //Sert a aficher la div de la modal
+  modal.setAttribute("aria-hidden", "false"); //indique modal affiché (pour malvoyant) au lecteur d'écran
+  modal.setAttribute("aria-modal", "true"); // indique que la div correspond a la modal
+};
+
+function refreshMiniature(travaux) {
+  containerImg.innerHTML = "";
   travaux.forEach((image) => {
     console.log(image);
     const imgElement = document.createElement("img");
@@ -52,29 +62,14 @@ const openModal = async (e) => {
       }
     });
   });
-
-  modal.style.display = "flex"; //Sert a aficher la div de la modal
-  modal.setAttribute("aria-hidden", "false"); //indique modal affiché (pour malvoyant) au lecteur d'écran
-  modal.setAttribute("aria-modal", "true"); // indique que la div correspond a la modal
-};
-
+}
 const closeModal = function (e) {
   const boutonAjouterDisplay =
     document.querySelector("#bouton-ajouter").style.display;
   console.log(boutonAjouterDisplay);
-  if (boutonAjouterDisplay === "none") {
-    console.log("close");
-    //retour première modale
-    document.querySelector(".container_suppression").style.display = "grid";
-    document.querySelector(".ajout-photo").style.display = "none";
-    document.querySelector("#bouton-ajouter").style.display = "block";
-    document.querySelector(".titre-gallerie").style.display = "block";
-    document.querySelector(".supr_container").style.display = "block";
-  } else {
-    containerImg.innerHTML = "";
-    modal.style.display = "none"; //masque la div de la modal
-    modal.setAttribute("aria-hidden", "true");
-  }
+  containerImg.innerHTML = "";
+  modal.style.display = "none"; //masque la div de la modal
+  modal.setAttribute("aria-hidden", "true");
 };
 
 document
@@ -89,6 +84,27 @@ window.addEventListener("keydown", function (e) {
   }
 });
 
+function resetForm() {
+  console.log("close");
+  //retour première modale
+  document.querySelector(".container_suppression").style.display = "grid";
+  document.querySelector(".ajout-photo").style.display = "none";
+  document.querySelector("#bouton-ajouter").style.display = "block";
+  document.querySelector(".titre-gallerie").style.display = "block";
+  document.querySelector(".supr_container").style.display = "block";
+
+  const form = document.querySelector(".form-ajout-photo");
+  form.reset();
+
+  imgPreview.innerHTML = "";
+  document.querySelector("label").style.display = "block";
+  document.querySelector(".fa-regular").style.display = "inline";
+  document.querySelector(".size_max").style.display = "block";
+
+  chooseFile.addEventListener("change", function () {
+    getImgData();
+  });
+}
 //Ajouter photo (acces a la suite de la modal)
 const addPhoto = document.querySelector(".js-modal-2");
 const boutonAjoutPhoto = document.querySelector("#bouton-ajouter");
@@ -166,7 +182,7 @@ formAddPicture.addEventListener("submit", (event) => {
     console.log(res);
     if (res.ok) {
       const modaleGallery = document.querySelector(".modal");
-      modaleGallery.innerHTML = "";
+      //modaleGallery.innerHTML = "";
       getImgData();
       refreshData();
 
@@ -188,21 +204,9 @@ formAddPicture.addEventListener("submit", (event) => {
   async function refreshData() {
     const newTravaux = await fetchData();
     displayTravaux(newTravaux);
+    refreshMiniature(newTravaux);
+    resetForm();
   }
-  /**try {
-    const response = response.json();
-
-    if (response.ok) {
-      const modaleGallery = document.querySelector(".modal");
-      modaleGallery.innerHTML = "";
-      getImgData();
-      alert("Nouvelle ressource DL");
-    } else {
-      alert("erreur DL new ressources");
-    }
-  } catch (error) {
-    alert("erreur lors créa ressource", error);
-  }**/
 });
 
 // Dynamiser categorie dans modifier
